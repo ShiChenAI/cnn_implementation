@@ -29,14 +29,16 @@ def get_network(file_name):
         file_name: String, network file name
 
     Returns:
+        layers: List, network layers
         weights: Dictionary, network weights for all layers
         biases: Dictionary, network biases for all layers
     """
 
-    
+
     with open(file_name, 'r') as f:
         model = json.load(f)
+        layers = model['layers']
         weights = model['weights']
         biases = model['biases']
 
-        return weights, biases
+        return layers, weights, biases

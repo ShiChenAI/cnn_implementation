@@ -1,4 +1,5 @@
-{"weights": 
+{"layers": ["conv1", "conv2", "conv3", "conv4", "conv5", "fc1", "fc2", "fc3"],
+ "weights": 
     {"wc1": [11, 11, 3, 64], 
      "wc2": [5, 5, 64, 192],
      "wc3": [3, 3, 192, 384],
