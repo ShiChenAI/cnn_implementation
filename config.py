@@ -1,4 +1,5 @@
 import configparser
+import json
 
 def get_configs(file_name, name, key):
     """Get configurations from configuration file
@@ -20,3 +21,22 @@ def get_configs(file_name, name, key):
         print(file_name + 'not exists or no configuration of ' + name)
 
     return conf.get(name, key)
+
+def get_network(file_name):
+    """Get network architecture from file
+
+    Arguments:
+        file_name: String, network file name
+
+    Returns:
+        weights: Dictionary, network weights for all layers
+        biases: Dictionary, network biases for all layers
+    """
+
+    
+    with open(file_name, 'r') as f:
+        model = json.load(f)
+        weights = model['weights']
+        biases = model['biases']
+
+        return weights, biases
