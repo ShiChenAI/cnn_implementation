@@ -11,6 +11,7 @@ import model
 import tfrecord
 import config
 
+
 FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string('eval_dir', 
                            config.get_configs('global.conf', 'eval', 'eval_log_dir'),
@@ -107,6 +108,7 @@ def main(argv=None):
         gfile.DeleteRecursively(FLAGS.eval_dir)
     gfile.MakeDirs(FLAGS.eval_dir)
     evaluate()
+
 
 if __name__ == '__main__':
     tf.app.run()

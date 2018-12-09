@@ -11,6 +11,7 @@ import model
 import tfrecord
 import config
 
+
 FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string('train_dir', 
                            config.get_configs('global.conf', 'model', 'model_dir'),
