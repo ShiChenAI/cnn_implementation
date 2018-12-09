@@ -19,7 +19,6 @@ MOVING_AVERAGE_DECAY = float(config.get_configs('global.conf', 'model', 'moving_
 NUM_EPOCHS_PER_DECAY = float(config.get_configs('global.conf', 'model', 'num_epochs_per_decay'))
 LEARNING_RATE_DECAY_FACTOR = float(config.get_configs('global.conf', 'model', 'learning_rate_decay_factor'))
 INITIAL_LEARNING_RATE = float(config.get_configs('global.conf', 'model', 'initial_average_decay'))
-KEEP_PROP = float(config.get_configs('global.conf', 'model', 'keep_prop'))
 
 TOWER_NAME = config.get_configs('global.conf', 'model', 'tower_name')
 
