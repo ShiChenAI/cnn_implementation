@@ -42,7 +42,7 @@ def variable_with_weight_decay(name, shape, stddev, wd):
     """
 
 
-    var = tf.get_variable(name, shape,tf.truncated_normal_initializer(stddev=stddev))
+    var = tf.get_variable(name, shape, initializer=tf.truncated_normal_initializer(stddev=stddev))
     if wd:
         weight_decay = tf.multiply(tf.nn.l2_loss(var), wd, name='weight_loss')
         tf.add_to_collection('losses', weight_decay)
@@ -56,7 +56,7 @@ def bias_variable(shape, init_value):
     """
 
 
-    return tf.get_variable(name='biases', shape, tf.constant_initializer(init_value))
+    return tf.get_variable('biases', shape, initializer=tf.constant_initializer(init_value))
  
 
 def conv2d(inputs, kernel, s, bias, name):
@@ -113,10 +113,11 @@ def inference(images, keep_prop):
     for index, layer in enumerate(layers):
         if layer.startswith('conv'):
             # Conv layers
+            print(layer)
             with tf.variable_scope(layer) as scope:
                 kernel = variable_with_weight_decay('weights', shape=weights['w'+layer], stddev=1e-4, wd=0.0)
-                bias = bias_variable(biases['b'+layer])
-                conv = conv2d(inputs, kernel, 1, bias, name=scope)
+                bias = bias_variable(biases['b'+layer], 0.0)
+                conv = conv2d(inputs, kernel, 1, bias, name=scope.name)
                 activation_summary(conv)
             
             pool = max_pool(conv, 3, 2, name='pool'+str(index+1))
@@ -126,16 +127,16 @@ def inference(images, keep_prop):
             # FC layers
             with tf.variable_scope(layer) as scope:
                 weight = variable_with_weight_decay('weights', shape=weights['w'+layer], stddev=0.04, wd=0.0004)
-                bias = bias_variable(biases['b'+layer])
+                bias = bias_variable(biases['b'+layer], 0.0)
                 if layer.endswith('1'):
                     reshape = tf.reshape(inputs, [-1, weight.get_shape().as_list()[0]])
-                    dense =  tf.nn.dropout(tf.nn.relu(tf.matmul(reshape, weight) + bias), keep_prob, name=scope) 
+                    dense =  tf.nn.dropout(tf.nn.relu(tf.matmul(reshape, weight) + bias), keep_prop, name=scope.name) 
                 else:
-                    dense =  tf.nn.dropout(tf.nn.relu(tf.matmul(inputs, weight) + bias), keep_prob, name=scope)
+                    dense =  tf.nn.dropout(tf.nn.relu(tf.matmul(inputs, weight) + bias), keep_prop, name=scope.name)
 
             inputs = dense
 
-        return dense
+    return dense
 
 
 def loss(logits, labels):

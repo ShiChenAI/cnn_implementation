@@ -131,6 +131,8 @@ def train_data_read(tfrecord_path, width=IMAGE_WIDTH, height=IMAGE_HEIGHT, chann
     
     if process_image:
         float_image = data_process(img)
+    else:
+        float_image = tf.cast(img, tf.float32)
     
     return float_image, label
 

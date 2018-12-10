@@ -33,7 +33,7 @@ tf.app.flags.DEFINE_integer('train_num',
                             int(config.get_configs('global.conf', 'train', 'train_data_count')),
                            """Total number of train data.""")
 
-tf.app.flags.DEFINE_FLOAT('keep_prop',
+tf.app.flags.DEFINE_float('keep_prop',
                           float(config.get_configs('global.conf', 'model', 'keep_prop')),
                           """Keep probability in dropout computing.""")
 
