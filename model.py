@@ -113,8 +113,8 @@ def inference(images, keep_prop):
     for index, layer in enumerate(layers):
         if layer.startswith('conv'):
             # Conv layers
-            print(layer)
-            with tf.variable_scope(layer) as scope:
+            #print(layer)
+            with tf.variable_scope(layer, reuse=tf.AUTO_REUSE) as scope:
                 kernel = variable_with_weight_decay('weights', shape=weights['w'+layer], stddev=1e-4, wd=0.0)
                 bias = bias_variable(biases['b'+layer], 0.0)
                 conv = conv2d(inputs, kernel, 1, bias, name=scope.name)
@@ -125,7 +125,7 @@ def inference(images, keep_prop):
             inputs = norm
         else:
             # FC layers
-            with tf.variable_scope(layer) as scope:
+            with tf.variable_scope(layer, reuse=tf.AUTO_REUSE) as scope:
                 weight = variable_with_weight_decay('weights', shape=weights['w'+layer], stddev=0.04, wd=0.0004)
                 bias = bias_variable(biases['b'+layer], 0.0)
                 if layer.endswith('1'):
@@ -169,6 +169,15 @@ def add_loss_summaries(total_loss):
         tf.summary.scalar(l.op.name, loss_averages.average(l))
     
     return loss_averages_op
+
+
+def accuracy(logits, labels):
+    """Compute accuracy opt
+
+    """
+
+
+    return tf.nn.in_top_k(logits, labels, 1)
 
 
 def train(total_loss, global_step):

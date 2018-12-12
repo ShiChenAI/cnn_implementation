@@ -23,13 +23,13 @@ tf.app.flags.DEFINE_string('checkpoint_dir',
                            config.get_configs('global.conf', 'model', 'model_dir'),
                            """Checkpoint dir.""")
 tf.app.flags.DEFINE_integer('eval_interval_secs',
-                            60*3,
+                            1,
                             """Evaluation interval time(sec)""")
 tf.app.flags.DEFINE_integer('num_examples', 
                             int(config.get_configs('global.conf', 'eval', 'eval_data_count')),
                             """Total number of train data.""")
 tf.app.flags.DEFINE_boolean('run_once', 
-                            False,
+                            True,
                             """Only run once.""")
 
 
