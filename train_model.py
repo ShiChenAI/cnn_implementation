@@ -10,6 +10,7 @@ import tensorflow as tf
 import model
 import tfrecord
 import config
+import eval_model
 
 
 FLAGS = tf.app.flags.FLAGS
@@ -76,19 +77,23 @@ def train():
             _, loss_value = sess.run([train_op, loss])
             duration = time.time() - start_time
             assert not np.isnan(loss_value), 'Model diverged with loss = NaN'
-            if step % 10 == 0:
+
+            # Evaluate model every 10 epochs.
+            if step % 10 == 1:
+                eval_model.evaluate()
+            else:
                 num_examples_per_step = FLAGS.batch_size
                 examples_per_sec = num_examples_per_step / duration
                 sec_per_batch = float(duration)
                 format_str = ('%s: step %d, loss = %.2f (%.1f examples/sec; %.3f ''sec/batch)')
                 print (format_str % (datetime.now(), step, loss_value, examples_per_sec, sec_per_batch))
-            if step % 50 == 0:
                 summary_str = sess.run(summary_op)
                 summary_writer.add_summary(summary_str, step)
-            # save checkpoint
-            if step % 1000 == 0 or (step + 1) == FLAGS.max_steps:
-                checkpoint_path = os.path.join(FLAGS.train_dir, 'model.ckpt')
-                saver.save(sess, checkpoint_path, global_step=step)
+                
+                # Save metadata in every 100 epochs.
+                if step % 100 == 99 or (step + 1) == FLAGS.max_steps: 
+                    checkpoint_path = os.path.join(FLAGS.train_dir, 'model.ckpt')
+                    saver.save(sess, checkpoint_path, global_step=step)
 
 
 def main(argv=None): 
