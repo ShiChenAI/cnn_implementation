@@ -10,26 +10,26 @@ Implementation of CNN using Tensorflow.
 ## Usage
 ### Configuration
 First configure your global parameters in **global.conf** as follows:
-**train_data_dir**: directory of training data.
-**eval_data_dir**: directory of evaluation data.
-**num_class**: number of classes to be classified.
-**resize_image_height**: resize the input images with the height.
-**resize_image_width**: resize the input images with the width.
-**chnnels**: channels of input images.
-**batch_size**: batch size in each step.
-**train_tfrecord_dir**: directory of training tfrecord.
-**train_data_count**: count of training data.
-**max_steps**: max steps during training.
-**eval_log_dir**: directory of evaluation log.
-**eval_tfrecord_dir**: directory of evaluation tfrecord.
-**eval_data_count**: count of evaluation data.
-**model_dir**: directory of the trained models.
-**moving_average_decay**: parameter of moving average decay.
-**num_epochs_per_decay**: parameter of number of epochs per decay.
-**learning_rate_decay_factor**: parameter of learning rate decay factor.
-**initial_average_decay**: parameter of initial average decay.
-**tower_name**: tower name.
-**keep_prop**: keep probability in dropout layer.
+- **train_data_dir**: directory of training data.
+- **eval_data_dir**: directory of evaluation data.
+- **num_class**: number of classes to be classified.
+- **resize_image_height**: resize the input images with the height.
+- **resize_image_width**: resize the input images with the width.
+- **chnnels**: channels of input images.
+- **batch_size**: batch size in each step.
+- **train_tfrecord_dir**: directory of training tfrecord.
+- **train_data_count**: count of training data.
+- **max_steps**: max steps during training.
+- **eval_log_dir**: directory of evaluation log.
+- **eval_tfrecord_dir**: directory of evaluation tfrecord.
+- **eval_data_count**: count of evaluation data.
+- **model_dir**: directory of the trained models.
+- **moving_average_decay**: parameter of moving average decay.
+- **num_epochs_per_decay**: parameter of number of epochs per decay.
+- **learning_rate_decay_factor**: parameter of learning rate decay factor.
+- **initial_average_decay**: parameter of initial average decay.
+- **tower_name**: tower name.
+- **keep_prop**: keep probability in dropout layer.
 
 ## Customizing network architecture
 You can customize your network architecture using **network.json** with the layer names (**"layers"**), layers weights (**"weights"**) and biases (**"biases"**) as follows: 
