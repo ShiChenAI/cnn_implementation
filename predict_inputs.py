@@ -8,6 +8,9 @@ FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string('checkpoint_dir', 
                            config.get_configs('global.conf', 'model', 'model_dir'),
                            """Checkpoint dir.""")
+tf.app.flags.DEFINE_string('input_img', 
+                           '',
+                           """input image to be predicted.""")
 
 
 def inputs(input, count=1, batch_size=1):
@@ -82,7 +85,7 @@ def predict(imgPath):
 
 
 def main(argv=None):
-    predict('./data/1.png')
+    predict(FLAGS.input_img)
 
 
 if __name__ == '__main__':

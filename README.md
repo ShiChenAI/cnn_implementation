@@ -7,6 +7,17 @@ Implementation of CNN using Tensorflow.
 2. Numpy 1.11.3
 3. PIL 5.1.0
 
+## Installation
+1. Clone this repository.
+```
+git clone https://github.com/ShiChenAI/cnn_implementation.git
+```
+
+2. Install the dependencies. The code should run with TensorFlow 1.0 and newer.
+```
+pip install -r requirements.txt  # or make install
+```
+
 ## Usage
 ### Configuration
 First configure your global parameters in **global.conf** as follows:
@@ -53,4 +64,32 @@ You can customize your network architecture using **network.json** with the laye
      "bfc1": [4096], 
      "bfc2": [4096],
      "bfc3": [10]}}
+``` 
+
+## Training model
+
+``` 
+python train_model.py
+``` 
+You will get:
+``` 
+2018-12-12 20:54:18.709988: step 0, loss = 7.31 (78.9 examples/sec; 0.634 sec/batch)
+2018-12-12 20:54:57.119095: step 1, loss = 7.29 (78.9 examples/sec; 0.634 sec/batch)
+``` 
+The model will be evaluated in each 100 steps:
+``` 
+2018-12-12 21:41:39.556357: precision @ 1 = 1.000
+``` 
+
+## Visualization in TensorBoard
+To start Tensorflow, run the following command on the console:
+``` 
+#!bash
+
+tensorboard --logdir=./model
+``` 
+
+## Prediction
+``` 
+python predict_inputs.py --input_img ./data/1.png
 ``` 
