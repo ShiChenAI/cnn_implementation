@@ -1,5 +1,5 @@
 # cnn_implementation
-Implementation of CNN using Tensorflow.
+A simple implementation of CNN using Tensorflow.
 
 ## Requirements
 0. Python 3.x
@@ -42,7 +42,7 @@ First configure your global parameters in **global.conf** as follows:
 - **tower_name**: tower name.
 - **keep_prop**: keep probability in dropout layer.
 
-## Customizing network architecture
+### Customizing network architecture
 You can customize your network architecture using **network.json** with the layer names (**"layers"**), layers weights (**"weights"**) and biases (**"biases"**) as follows: 
 ```
 {"layers": ["conv1", "conv2", "conv3", "conv4", "conv5", "fc1", "fc2", "fc3"],
@@ -66,7 +66,7 @@ You can customize your network architecture using **network.json** with the laye
      "bfc3": [10]}}
 ``` 
 
-## Training model
+### Training model
 
 ``` 
 python train_model.py
@@ -81,7 +81,7 @@ The model will be evaluated in each 100 steps:
 2018-12-12 21:41:39.556357: precision @ 1 = 1.000
 ``` 
 
-## Visualization in TensorBoard
+### Visualization in TensorBoard
 To start Tensorflow, run the following command on the console:
 ``` 
 #!bash
@@ -89,7 +89,7 @@ To start Tensorflow, run the following command on the console:
 tensorboard --logdir=./model
 ``` 
 
-## Prediction
+### Prediction
 ``` 
 python predict_inputs.py --input_img ./data/1.png
 ``` 
