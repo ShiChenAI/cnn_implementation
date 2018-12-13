@@ -46,6 +46,9 @@ tf.app.flags.DEFINE_float('keep_prob',
                           float(config.get_configs('global.conf', 'model', 'keep_prob')),
                           """Keep probability in dropout computing.""")
 
+tf.app.flags.DEFINE_boolean('create_train_eval_data', 
+                            True,
+                            """Create train data (80%) and evaluation data(20%) from original data.""")
 
 def train():
     with tf.Graph().as_default():
@@ -61,7 +64,7 @@ def train():
         
         # Model inference
         keep_prob = tf.placeholder(tf.float32, name='keep_prob') 
-        logits = model.inference(images, keep_prop)
+        logits = model.inference(images, keep_prob)
         
         # loss computing
         loss = model.loss(logits, labels)
@@ -130,6 +133,9 @@ def train():
 
 
 def main(argv=None): 
+    if FLAGS.create_train_eval_data:
+        tfrecord.create_train_eval_data()
+        
     train()
 
 
