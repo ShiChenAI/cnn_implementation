@@ -176,8 +176,8 @@ def accuracy(logits, labels):
 
     """
 
-
-    correct = tf.nn.in_top_k(logits, labels, 1)
+    sparse_labels = tf.reshape(labels, [FLAGS.batch_size])
+    correct = tf.nn.in_top_k(logits, sparse_labels, 1)
     correct = tf.cast(correct, tf.float16)
     accuracy = tf.reduce_mean(correct)
     tf.summary.scalar('accuracy', accuracy)

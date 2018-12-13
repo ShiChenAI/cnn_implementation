@@ -59,6 +59,10 @@ tf.app.flags.DEFINE_integer('image_width',
                             int(config.get_configs('global.conf', 'dataset', 'resize_image_width')),
                             """Resized image width.""")
 
+tf.app.flags.DEFINE_integer('image_channels', 
+                            int(config.get_configs('global.conf', 'dataset', 'channels')),
+                            """Image channels.""")
+
 tf.app.flags.DEFINE_integer('num_class', 
                             int(config.get_configs('global.conf', 'dataset', 'num_class')),
                             """Number of classes.""")
@@ -75,10 +79,10 @@ def train():
         # Get evaluate images and labels
         eval_float_image, eval_label = tfrecord.eval_data_read(tfrecord_path=FLAGS.eval_data_dir)
         eval_images, eval_labels = tfrecord.create_batch(eval_float_image, eval_label, count_num=FLAGS.eval_num)
-        
+
         # Model inference
-        x = tf.placeholder(tf.float32, [None, FLAGS.image_height*FLAGS.image_width], name='x_input')
-        y_ = tf.placeholder(tf.float32, [None, FLAGS.num_class], name='y_input')
+        x = tf.placeholder(tf.float32, [FLAGS.batch_size, FLAGS.image_height, FLAGS.image_width, FLAGS.image_channels], name='x_input')
+        y_ = tf.placeholder(tf.int32, [FLAGS.batch_size, None], name='y_input')
         keep_prob = tf.placeholder(tf.float32)
         #logits = model.inference(images, FLAGS.keep_prob)
         logits = model.inference(x, keep_prob)
@@ -112,17 +116,19 @@ def train():
                                                graph_def=sess.graph_def)
         for step in xrange(FLAGS.max_steps):
             if step % 10 == 0:
+                imgs, lbls = sess.run([eval_images, eval_labels])
                 summary_str, acc = sess.run([summary_op, accuracy], 
-                                            feed_dict = {x: eval_images, 
-                                                         y_: eval_labels,
+                                            feed_dict = {x: imgs, 
+                                                         y_: np.reshape(lbls, (FLAGS.batch_size, -1)),
                                                          keep_prob: 1.0})
                 summary_writer.add_summary(summary_str, step)
                 print('%s: step %d, accuracy = %.3f' % (datetime.now(), step, acc))
             else:
+                imgs, lbls = sess.run([images, labels])
                 if step % 100 == 99 or (step + 1) == FLAGS.max_steps: 
                     summary_str, _ = sess.run([summary_op, train_op], 
-                                              feed_dict = {x: images, 
-                                                           y_: labels,
+                                              feed_dict = {x: imgs, 
+                                                           y_: np.reshape(lbls, (FLAGS.batch_size, -1)),
                                                            keep_prob: FLAGS.keep_prob})
                     summary_writer.add_summary(summary_str, step)
                     checkpoint_path = os.path.join(FLAGS.train_dir, 'model.ckpt')
@@ -130,8 +136,8 @@ def train():
                 else:
                     start_time = time.time()
                     _, loss_value = sess.run([train_op, loss], 
-                                             feed_dict = {x: images, 
-                                                          y_: labels,
+                                             feed_dict = {x: imgs, 
+                                                          y_: np.reshape(lbls, (FLAGS.batch_size, -1)),
                                                           keep_prob: FLAGS.keep_prob})
                     duration = time.time() - start_time
                     assert not np.isnan(loss_value), 'Model diverged with loss = NaN'

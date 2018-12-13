@@ -8,7 +8,7 @@ import config
 
 IMAGE_HEIGHT = int(config.get_configs('global.conf', 'dataset', 'resize_image_height')) 
 IMAGE_WIDTH = int(config.get_configs('global.conf', 'dataset', 'resize_image_width')) 
-CHANNELS = int(config.get_configs('global.conf', 'dataset', 'chnnels'))  
+CHANNELS = int(config.get_configs('global.conf', 'dataset', 'channels'))  
 ORIGIN_DATASET = config.get_configs('global.conf', 'dataset', 'origin_data_dir') 
 TRAIN_DATASET = config.get_configs('global.conf', 'dataset', 'train_data_dir') 
 EVAL_DATASET = config.get_configs('global.conf', 'dataset', 'eval_data_dir') 
