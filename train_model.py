@@ -64,13 +64,16 @@ def train():
         eval_images, eval_labels = tfrecord.create_batch(eval_float_image, eval_label, count_num=FLAGS.eval_num)
         
         # Model inference
-        logits = model.inference(images, FLAGS.keep_prob)
+        keep_prob = tf.placeholder(tf.float32)
+        #logits = model.inference(images, FLAGS.keep_prob)
+        logits = model.inference(images, keep_prob)
         
         # loss computing
         loss = model.loss(logits, labels)
 
         # accuracy compution
-        accuracy = model.accuracy(model.inference(eval_images, 1), eval_labels)
+        #accuracy = model.accuracy(model.inference(eval_images, 1), eval_labels)
+        accuracy = model.accuracy(logits, eval_labels)
 
         # train model
         train_op = model.train(loss, global_step)
@@ -93,20 +96,33 @@ def train():
         summary_writer = tf.summary.FileWriter(FLAGS.train_dir,
                                                graph_def=sess.graph_def)
         for step in xrange(FLAGS.max_steps):
-            start_time = time.time()
-            _, loss_value = sess.run([train_op, loss])
-            duration = time.time() - start_time
-            assert not np.isnan(loss_value), 'Model diverged with loss = NaN'
+            if i % 10 == 0:
+                summary, acc = sess.run([summary_op, accuracy], feed_dict = {keep_prob: 1.0})
+                print('%s: step %d, precision = %.3f' % (datetime.now(), step, precision))
+            else:
+                if i % 100 == 99 or (step + 1) == FLAGS.max_steps: 
+                    summary_str, _ = sess.run([summary_op, train_op], feed_dict = {keep_prob: FLAGS.keep_prob})
+                    summary_writer.add_summary(summary_str, step)
+                    checkpoint_path = os.path.join(FLAGS.train_dir, 'model.ckpt')
+                    saver.save(sess, checkpoint_path, global_step=step)
+                else:
+                    start_time = time.time()
+                    summary_str, _, loss_value = sess.run([summary_op, train_op, loss], feed_dict = {keep_prob: FLAGS.keep_prob})
+                    duration = time.time() - start_time
+                    assert not np.isnan(loss_value), 'Model diverged with loss = NaN'
 
-            num_examples_per_step = FLAGS.batch_size
-            examples_per_sec = num_examples_per_step / duration
-            sec_per_batch = float(duration)
+                    num_examples_per_step = FLAGS.batch_size
+                    examples_per_sec = num_examples_per_step / duration
+                    sec_per_batch = float(duration)
 
-            format_str = ('%s: step %d, loss = %.2f (%.1f examples/sec; %.3f ''sec/batch)')
-            print (format_str % (datetime.now(), step, loss_value, examples_per_sec, sec_per_batch))
-            
+                    format_str = ('%s: step %d, loss = %.2f (%.1f examples/sec; %.3f ''sec/batch)')
+                    print (format_str % (datetime.now(), step, loss_value, examples_per_sec, sec_per_batch))
+                    summary_writer.add_summary(summary_str, step)
+                    
+            """
              # Compute accuracy
             if step % 100 == 0:
+                
                 num_iter = int(math.ceil(FLAGS.eval_num / FLAGS.batch_size))    # Iteration number
                 true_count = 0  # True predicted count
                 total_sample_count = num_iter * FLAGS.batch_size # Total evaluated data number 
@@ -123,6 +139,7 @@ def train():
                 summary.ParseFromString(sess.run(summary_op))
                 summary.value.add(tag='Precision @ 1', simple_value=precision)
                 summary_writer.add_summary(summary, step)
+                
  
             # Save metadata in every 100 epochs.
             if step % 100 == 99 or (step + 1) == FLAGS.max_steps: 
@@ -130,6 +147,8 @@ def train():
                 summary_writer.add_summary(summary_str, step)
                 checkpoint_path = os.path.join(FLAGS.train_dir, 'model.ckpt')
                 saver.save(sess, checkpoint_path, global_step=step)
+
+            """
 
 def main(argv=None): 
     if FLAGS.create_train_eval_data:

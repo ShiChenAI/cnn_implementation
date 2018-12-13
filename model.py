@@ -177,7 +177,10 @@ def accuracy(logits, labels):
     """
 
 
-    return tf.nn.in_top_k(logits, labels, 1)
+    accuracy = tf.nn.in_top_k(logits, labels, 1)
+    tf.summary.scalar('accuracy', accuracy)
+    
+    return accuracy
 
 
 def train(total_loss, global_step):
