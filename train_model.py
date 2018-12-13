@@ -42,8 +42,8 @@ tf.app.flags.DEFINE_integer('eval_num',
                             int(config.get_configs('global.conf', 'eval', 'eval_data_count')),
                             """Total number of train data.""")
                 
-tf.app.flags.DEFINE_float('keep_prop',
-                          float(config.get_configs('global.conf', 'model', 'keep_prop')),
+tf.app.flags.DEFINE_float('keep_prob',
+                          float(config.get_configs('global.conf', 'model', 'keep_prob')),
                           """Keep probability in dropout computing.""")
 
 
@@ -60,13 +60,14 @@ def train():
         eval_images, eval_labels = tfrecord.create_batch(eval_float_image, eval_label, count_num=FLAGS.eval_num)
         
         # Model inference
-        logits = model.inference(images, FLAGS.keep_prop)
+        keep_prob = tf.placeholder(tf.float32, name='keep_prob') 
+        logits = model.inference(images, keep_prop)
         
         # loss computing
         loss = model.loss(logits, labels)
 
         # accuracy compution
-        accuracy = model.accuracy(model.inference(eval_images, 1), eval_labels)
+        accuracy = model.accuracy(logits, eval_labels)
 
         # train model
         train_op = model.train(loss, global_step)
@@ -90,7 +91,7 @@ def train():
                                                graph_def=sess.graph_def)
         for step in xrange(FLAGS.max_steps):
             start_time = time.time()
-            _, loss_value = sess.run([train_op, loss])
+            _, loss_value = sess.run([train_op, loss], feed_dict={keep_prob: FLAGS.keep_prob})
             duration = time.time() - start_time
             assert not np.isnan(loss_value), 'Model diverged with loss = NaN'
 
@@ -108,7 +109,7 @@ def train():
                 total_sample_count = num_iter * FLAGS.batch_size # Total evaluated data number 
                 eval_step = 0
                 while eval_step < num_iter and not tf.train.Coordinator().should_stop():
-                    predictions = sess.run([accuracy]) #e.g. return [true,false,true,false,false]
+                    predictions = sess.run([accuracy], feed_dict={keep_prob: 1.0}) #e.g. return [true,false,true,false,false]
                     true_count += np.sum(predictions)
                     eval_step += 1
                 

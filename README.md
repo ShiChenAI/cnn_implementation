@@ -40,7 +40,7 @@ First configure your global parameters in **global.conf** as follows:
 - **learning_rate_decay_factor**: parameter of learning rate decay factor.
 - **initial_average_decay**: parameter of initial average decay.
 - **tower_name**: tower name.
-- **keep_prop**: keep probability in dropout layer.
+- **keep_prob**: keep probability in dropout layer.
 
 ### Customizing network architecture
 You can customize your network architecture using **network.json** with the layer names (**"layers"**), layers weights (**"weights"**) and biases (**"biases"**) as follows: 
