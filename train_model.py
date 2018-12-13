@@ -11,6 +11,7 @@ import tensorflow as tf
 import model
 import tfrecord
 import config
+import eval_model
 
 
 FLAGS = tf.app.flags.FLAGS
@@ -47,7 +48,7 @@ tf.app.flags.DEFINE_float('keep_prob',
                           """Keep probability in dropout computing.""")
 
 tf.app.flags.DEFINE_boolean('create_train_eval_data', 
-                            True,
+                            False,
                             """Create train data (80%) and evaluation data(20%) from original data.""")
 
 def train():
@@ -63,14 +64,13 @@ def train():
         eval_images, eval_labels = tfrecord.create_batch(eval_float_image, eval_label, count_num=FLAGS.eval_num)
         
         # Model inference
-        keep_prob = tf.placeholder(tf.float32, name='keep_prob') 
-        logits = model.inference(images, keep_prob)
+        logits = model.inference(images, FLAGS.keep_prob)
         
         # loss computing
         loss = model.loss(logits, labels)
 
         # accuracy compution
-        accuracy = model.accuracy(logits, eval_labels)
+        accuracy = model.accuracy(model.inference(eval_images, 1), eval_labels)
 
         # train model
         train_op = model.train(loss, global_step)
@@ -94,7 +94,7 @@ def train():
                                                graph_def=sess.graph_def)
         for step in xrange(FLAGS.max_steps):
             start_time = time.time()
-            _, loss_value = sess.run([train_op, loss], feed_dict={keep_prob: FLAGS.keep_prob})
+            _, loss_value = sess.run([train_op, loss])
             duration = time.time() - start_time
             assert not np.isnan(loss_value), 'Model diverged with loss = NaN'
 
@@ -105,14 +105,14 @@ def train():
             format_str = ('%s: step %d, loss = %.2f (%.1f examples/sec; %.3f ''sec/batch)')
             print (format_str % (datetime.now(), step, loss_value, examples_per_sec, sec_per_batch))
             
-            # Compute accuracy
+             # Compute accuracy
             if step % 100 == 0:
                 num_iter = int(math.ceil(FLAGS.eval_num / FLAGS.batch_size))    # Iteration number
                 true_count = 0  # True predicted count
                 total_sample_count = num_iter * FLAGS.batch_size # Total evaluated data number 
                 eval_step = 0
                 while eval_step < num_iter and not tf.train.Coordinator().should_stop():
-                    predictions = sess.run([accuracy], feed_dict={keep_prob: 1.0}) #e.g. return [true,false,true,false,false]
+                    predictions = sess.run([accuracy]) #e.g. return [true,false,true,false,false]
                     true_count += np.sum(predictions)
                     eval_step += 1
                 
@@ -123,14 +123,13 @@ def train():
                 summary.ParseFromString(sess.run(summary_op))
                 summary.value.add(tag='Precision @ 1', simple_value=precision)
                 summary_writer.add_summary(summary, step)
-
+ 
             # Save metadata in every 100 epochs.
             if step % 100 == 99 or (step + 1) == FLAGS.max_steps: 
                 summary_str = sess.run(summary_op)
                 summary_writer.add_summary(summary_str, step)
                 checkpoint_path = os.path.join(FLAGS.train_dir, 'model.ckpt')
                 saver.save(sess, checkpoint_path, global_step=step)
-
 
 def main(argv=None): 
     if FLAGS.create_train_eval_data:
