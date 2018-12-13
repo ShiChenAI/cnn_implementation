@@ -1,11 +1,15 @@
 import tensorflow as tf
-import os,sys,time
+import os
+import sys
+import time
+import random
 from PIL import Image
 import config
 
 IMAGE_HEIGHT = int(config.get_configs('global.conf', 'dataset', 'resize_image_height')) 
 IMAGE_WIDTH = int(config.get_configs('global.conf', 'dataset', 'resize_image_width')) 
 CHANNELS = int(config.get_configs('global.conf', 'dataset', 'chnnels'))  
+ORIGIN_DATASET = config.get_configs('global.conf', 'dataset', 'origin_data_dir') 
 TRAIN_DATASET = config.get_configs('global.conf', 'dataset', 'train_data_dir') 
 EVAL_DATASET = config.get_configs('global.conf', 'dataset', 'eval_data_dir') 
 BATCH_SIZE = int(config.get_configs('global.conf', 'dataset', 'batch_size'))
@@ -185,3 +189,45 @@ def create_batch(float_image, label, count_num, batch_size=BATCH_SIZE):
     tf.summary.image('images', images)
 
     return images, label_batch
+
+
+def create_train_eval_data():
+    """Create train data (80%) and evaluation data(20%) from original data.
+
+    """
+
+    
+    if tf.gfile.Exists(TRAIN_DATASET):
+        tf.gfile.DeleteRecursively(TRAIN_DATASET)
+        
+    if tf.gfile.Exists(EVAL_DATASET):
+        tf.gfile.DeleteRecursively(EVAL_DATASET)
+        
+    tf.gfile.MkDir(TRAIN_DATASET) 
+    tf.gfile.MkDir(EVAL_DATASET) 
+
+    unique_labels = []
+    dirs = os.listdir(ORIGIN_DATASET)
+    for cur_dir in dirs:
+        m = os.path.join(ORIGIN_DATASET, cur_dir)
+        if (os.path.isdir(m)):
+            h = os.path.split(m)
+            unique_labels.append(h[1])
+
+    for label in unique_labels:
+        img_file_path = '%s%s/*' % (ORIGIN_DATASET, label)
+        matching_files = tf.gfile.Glob(img_file_path)
+        count = int(0.8 * len(matching_files))
+        train_indexs = random.sample(range(0, len(matching_files)), count)
+
+        for index in range(len(matching_files)):
+            if index in train_indexs:
+                if not tf.gfile.Exists('%s%s/' % (TRAIN_DATASET, label)):
+                    tf.gfile.MkDir('%s%s/' % (TRAIN_DATASET, label)) 
+                new_path = '%s%s/%s' % (TRAIN_DATASET, label, os.path.basename(matching_files[index]))
+                tf.gfile.Copy(matching_files[index], new_path, overwrite = False)
+            else:
+                if not tf.gfile.Exists('%s%s/' % (EVAL_DATASET, label)):
+                    tf.gfile.MkDir('%s%s/' % (EVAL_DATASET, label)) 
+                new_path = '%s%s/%s' % (EVAL_DATASET, label, os.path.basename(matching_files[index]))
+                tf.gfile.Copy(matching_files[index], new_path, overwrite = False) 
