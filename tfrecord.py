@@ -196,7 +196,7 @@ def create_train_eval_data():
 
     """
 
-    
+
     if tf.gfile.Exists(TRAIN_DATASET):
         tf.gfile.DeleteRecursively(TRAIN_DATASET)
         
@@ -215,19 +215,19 @@ def create_train_eval_data():
             unique_labels.append(h[1])
 
     for label in unique_labels:
-        img_file_path = '%s%s/*' % (ORIGIN_DATASET, label)
+        img_file_path = '%s/%s/*' % (ORIGIN_DATASET, label)
         matching_files = tf.gfile.Glob(img_file_path)
         count = int(0.8 * len(matching_files))
         train_indexs = random.sample(range(0, len(matching_files)), count)
 
         for index in range(len(matching_files)):
             if index in train_indexs:
-                if not tf.gfile.Exists('%s%s/' % (TRAIN_DATASET, label)):
-                    tf.gfile.MkDir('%s%s/' % (TRAIN_DATASET, label)) 
-                new_path = '%s%s/%s' % (TRAIN_DATASET, label, os.path.basename(matching_files[index]))
+                if not tf.gfile.Exists('%s/%s/' % (TRAIN_DATASET, label)):
+                    tf.gfile.MkDir('%s/%s/' % (TRAIN_DATASET, label)) 
+                new_path = '%s/%s/%s' % (TRAIN_DATASET, label, os.path.basename(matching_files[index]))
                 tf.gfile.Copy(matching_files[index], new_path, overwrite = False)
             else:
-                if not tf.gfile.Exists('%s%s/' % (EVAL_DATASET, label)):
-                    tf.gfile.MkDir('%s%s/' % (EVAL_DATASET, label)) 
-                new_path = '%s%s/%s' % (EVAL_DATASET, label, os.path.basename(matching_files[index]))
+                if not tf.gfile.Exists('%s/%s/' % (EVAL_DATASET, label)):
+                    tf.gfile.MkDir('%s/%s/' % (EVAL_DATASET, label)) 
+                new_path = '%s/%s/%s' % (EVAL_DATASET, label, os.path.basename(matching_files[index]))
                 tf.gfile.Copy(matching_files[index], new_path, overwrite = False) 
