@@ -177,7 +177,9 @@ def accuracy(logits, labels):
     """
 
 
-    accuracy = tf.nn.in_top_k(logits, labels, 1)
+    correct = tf.nn.in_top_k(logits, labels, 1)
+    correct = tf.cast(correct, tf.float16)
+    accuracy = tf.reduce_mean(correct)
     tf.summary.scalar('accuracy', accuracy)
     
     return accuracy

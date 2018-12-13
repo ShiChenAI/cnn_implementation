@@ -96,18 +96,19 @@ def train():
         summary_writer = tf.summary.FileWriter(FLAGS.train_dir,
                                                graph_def=sess.graph_def)
         for step in xrange(FLAGS.max_steps):
-            if i % 10 == 0:
-                summary, acc = sess.run([summary_op, accuracy], feed_dict = {keep_prob: 1.0})
-                print('%s: step %d, precision = %.3f' % (datetime.now(), step, precision))
+            if step % 10 == 0:
+                summary_str, acc = sess.run([summary_op, accuracy], feed_dict = {keep_prob: 1.0})
+                summary_writer.add_summary(summary_str, step)
+                print('%s: step %d, accuracy = %.3f' % (datetime.now(), step, acc))
             else:
-                if i % 100 == 99 or (step + 1) == FLAGS.max_steps: 
+                if step % 100 == 99 or (step + 1) == FLAGS.max_steps: 
                     summary_str, _ = sess.run([summary_op, train_op], feed_dict = {keep_prob: FLAGS.keep_prob})
                     summary_writer.add_summary(summary_str, step)
                     checkpoint_path = os.path.join(FLAGS.train_dir, 'model.ckpt')
                     saver.save(sess, checkpoint_path, global_step=step)
                 else:
                     start_time = time.time()
-                    summary_str, _, loss_value = sess.run([summary_op, train_op, loss], feed_dict = {keep_prob: FLAGS.keep_prob})
+                    _, loss_value = sess.run([train_op, loss], feed_dict = {keep_prob: FLAGS.keep_prob})
                     duration = time.time() - start_time
                     assert not np.isnan(loss_value), 'Model diverged with loss = NaN'
 
@@ -117,38 +118,7 @@ def train():
 
                     format_str = ('%s: step %d, loss = %.2f (%.1f examples/sec; %.3f ''sec/batch)')
                     print (format_str % (datetime.now(), step, loss_value, examples_per_sec, sec_per_batch))
-                    summary_writer.add_summary(summary_str, step)
                     
-            """
-             # Compute accuracy
-            if step % 100 == 0:
-                
-                num_iter = int(math.ceil(FLAGS.eval_num / FLAGS.batch_size))    # Iteration number
-                true_count = 0  # True predicted count
-                total_sample_count = num_iter * FLAGS.batch_size # Total evaluated data number 
-                eval_step = 0
-                while eval_step < num_iter and not tf.train.Coordinator().should_stop():
-                    predictions = sess.run([accuracy]) #e.g. return [true,false,true,false,false]
-                    true_count += np.sum(predictions)
-                    eval_step += 1
-                
-                # Compute precision
-                precision = true_count / total_sample_count
-                print('%s: precision @ 1 = %.3f' % (datetime.now(), precision))
-                summary = tf.Summary()
-                summary.ParseFromString(sess.run(summary_op))
-                summary.value.add(tag='Precision @ 1', simple_value=precision)
-                summary_writer.add_summary(summary, step)
-                
- 
-            # Save metadata in every 100 epochs.
-            if step % 100 == 99 or (step + 1) == FLAGS.max_steps: 
-                summary_str = sess.run(summary_op)
-                summary_writer.add_summary(summary_str, step)
-                checkpoint_path = os.path.join(FLAGS.train_dir, 'model.ckpt')
-                saver.save(sess, checkpoint_path, global_step=step)
-
-            """
 
 def main(argv=None): 
     if FLAGS.create_train_eval_data:
