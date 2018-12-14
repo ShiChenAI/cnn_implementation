@@ -105,8 +105,10 @@ venv.bak/
 
 *.jpg
 *.png
+*.tar.gz
 train/
 eval/
 tfrecord/
 model/
 eval_log/
+data/
