@@ -231,3 +231,5 @@ def create_train_eval_data():
                     tf.gfile.MkDir('%s/%s/' % (EVAL_DATASET, label)) 
                 new_path = '%s/%s/%s' % (EVAL_DATASET, label, os.path.basename(matching_files[index]))
                 tf.gfile.Copy(matching_files[index], new_path, overwrite = False) 
+            
+            print('Copyed file from %s to %s ' % (matching_files[index], new_path))

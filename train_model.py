@@ -48,7 +48,7 @@ tf.app.flags.DEFINE_float('keep_prob',
                           """Keep probability in dropout computing.""")
 
 tf.app.flags.DEFINE_boolean('create_train_eval_data', 
-                            False,
+                            True,
                             """Create train data (80%) and evaluation data(20%) from original data.""")
 
 tf.app.flags.DEFINE_integer('image_height', 
