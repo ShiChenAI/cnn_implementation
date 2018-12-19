@@ -9,8 +9,15 @@ tf.app.flags.DEFINE_string('checkpoint_dir',
                            config.get_configs('global.conf', 'model', 'model_dir'),
                            """Checkpoint dir.""")
 tf.app.flags.DEFINE_string('input_img', 
-                           '',
+                           './eval/bar/211-2-2.jpg',
                            """input image to be predicted.""")
+tf.app.flags.DEFINE_integer('image_height', 
+                            int(config.get_configs('global.conf', 'dataset', 'resize_image_height')),
+                            """Resized image height.""")
+
+tf.app.flags.DEFINE_integer('image_width', 
+                            int(config.get_configs('global.conf', 'dataset', 'resize_image_width')),
+                            """Resized image width.""")
 
 
 def inputs(input, count=1, batch_size=1):
@@ -21,10 +28,10 @@ def inputs(input, count=1, batch_size=1):
 
     model.FLAGS.batch_size = batch_size
     img = Image.open(input)
-    img = img.resize((32, 32))
+    img = img.resize((FLAGS.image_width, FLAGS.image_height))
     img = img.tobytes()
     img = tf.decode_raw(img, tf.uint8)
-    img = tf.reshape(img, [3, 32, 32])
+    img = tf.reshape(img, [3, FLAGS.image_width, FLAGS.image_height])
     img = tf.transpose(img, [1, 2, 0])
     img = tf.cast(img, tf.float32)
     float_image = tf.image.per_image_standardization(img)

@@ -233,3 +233,31 @@ def create_train_eval_data():
                 tf.gfile.Copy(matching_files[index], new_path, overwrite = False) 
             
             print('Copyed file from %s to %s ' % (matching_files[index], new_path))
+
+def get_file_paths(file_dir, file_type):
+    file_paths=[] 
+    for root, dirs, files in os.walk(file_dir):
+        for file in files:
+            if os.path.splitext(file)[1] == file_type:
+                file_paths.append(os.path.join(root, file))
+    return file_paths
+
+def get_file_name(file_path):
+    (filepath,tempfilename) = os.path.split(file_path)
+    (filename,extension) = os.path.splitext(tempfilename)
+    return filepath, filename
+
+def png2jpg():
+    file_paths = get_file_paths('eval', '.png')
+    for file_path in file_paths:
+        im = Image.open(file_path)
+        im = im.convert('RGB')
+        new_path, new_name = get_file_name(file_path)
+        im.save(new_path + '/' + new_name + '.jpg')
+        os.remove(file_path)
+
+def main():
+    png2jpg()
+
+if __name__ == '__main__':
+    main()

@@ -108,6 +108,8 @@ venv.bak/
 *.tar.gz
 train/
 eval/
+train1/
+eval1/
 tfrecord/
 model/
 eval_log/

@@ -48,7 +48,7 @@ tf.app.flags.DEFINE_float('keep_prob',
                           """Keep probability in dropout computing.""")
 
 tf.app.flags.DEFINE_boolean('create_train_eval_data', 
-                            True,
+                            False,
                             """Create train data (80%) and evaluation data(20%) from original data.""")
 
 tf.app.flags.DEFINE_integer('image_height', 
@@ -81,7 +81,7 @@ def train():
         eval_images, eval_labels = tfrecord.create_batch(eval_float_image, eval_label, count_num=FLAGS.eval_num)
 
         # Model inference
-        x = tf.placeholder(tf.float32, [FLAGS.batch_size, FLAGS.image_height, FLAGS.image_width, FLAGS.image_channels], name='x_input')
+        x = tf.placeholder(tf.float32, [FLAGS.batch_size, FLAGS.image_width, FLAGS.image_height, FLAGS.image_channels], name='x_input')
         y_ = tf.placeholder(tf.int32, [FLAGS.batch_size, None], name='y_input')
         keep_prob = tf.placeholder(tf.float32)
         #logits = model.inference(images, FLAGS.keep_prob)

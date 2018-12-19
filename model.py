@@ -131,6 +131,8 @@ def inference(images, keep_prop):
                 if layer.endswith('1'):
                     reshape = tf.reshape(inputs, [-1, weight.get_shape().as_list()[0]])
                     dense =  tf.nn.dropout(tf.nn.relu(tf.matmul(reshape, weight) + bias), keep_prop, name=scope.name) 
+                elif layer.endswith('3'):
+                    dense = tf.add(tf.matmul(inputs, weight), bias, name=scope.name)
                 else:
                     dense =  tf.nn.dropout(tf.nn.relu(tf.matmul(inputs, weight) + bias), keep_prop, name=scope.name)
 
